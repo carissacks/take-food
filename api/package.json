@@ -1,0 +1,39 @@
+{
+  "name": "takefood-api",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node -r @swc-node/register src/index.ts",
+    "dev": "ts-node-dev --no-notify --respawn --transpile-only src/index.ts",
+    "build": "tsc --outDir lib/",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "lint": "eslint --max-warnings 0 \"src/**/*.{ts,tsx}\"",
+    "jest": "jest --coverage --passWithNoTests",
+    "test": "yarn lint && yarn typecheck && yarn format:check && yarn jest"
+  },
+  "dependencies": {
+    "@graphql-yoga/node": "^2.5.0",
+    "@pothos/core": "^3.10.1",
+    "graphql": "^16.5.0"
+  },
+  "devDependencies": {
+    "@swc-node/register": "^1.5.1",
+    "@types/jest": "^27.5.0",
+    "eslint": "^7.32.0",
+    "eslint-config-kodefox": "^1.2.0",
+    "jest": "^28.1.0",
+    "prettier": "^2.6.2",
+    "ts-jest": "^28.0.2",
+    "typescript": "^4.4.4"
+  },
+  "eslintConfig": {
+    "extends": "kodefox"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "arrowParens": "always"
+  },
+  "private": true
+}
