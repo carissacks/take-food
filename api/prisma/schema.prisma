@@ -7,9 +7,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  password String
-  name     String?
+model Customer {
+  id                  String         @id @default(cuid())
+  name                String
+  email               String         @unique
+  password            String
+  favoriteRestaurants Restaurant[]
+  orderHistory        OrderHistory[]
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
+
+model Restaurant {
+  id                 String         @id @default(cuid())
+  name               String
+  email              String         @unique
+  password           String
+  products           Product[]
+  favoredByCustomers Customer[]
+  orderHistory       OrderHistory[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+}
+
+model Product {
+  id           String         @id @default(cuid())
+  name         String
+  type         ProductType    @default(FOOD)
+  price        Int
+  restaurant   Restaurant     @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  orderHistory OrderHistory[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model OrderHistory {
+  id           String     @id @default(cuid())
+  customer     Customer   @relation(fields: [customerId], references: [id])
+  customerId   String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  products     Product[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+enum ProductType {
+  FOOD
+  BEVERAGE
 }
