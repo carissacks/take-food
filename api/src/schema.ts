@@ -1,16 +1,9 @@
-import SchemaBuilder from '@pothos/core';
+import { builder } from './builder';
 
-const builder = new SchemaBuilder({});
+import './graphql/typeSchemas/Customer';
+import './graphql/typeSchemas/Restaurant';
 
-builder.queryType({
-  fields: (t) => ({
-    hello: t.string({
-      args: {
-        name: t.arg.string(),
-      },
-      resolve: (parent, { name }) => `Hello, ${name || 'World!'}`,
-    }),
-  }),
-});
+import './graphql/resolvers/CustomerResolver';
+import './graphql/resolvers/RestaurantResolver';
 
 export const schema = builder.toSchema({});
