@@ -31,4 +31,35 @@ builder.mutationFields((t) => ({
     resolve: async (query, _root, { name, email, password }, _ctx, _info) =>
       db.restaurant.create({ ...query, data: { name, email, password } }),
   }),
+  updateRestaurant: t.prismaField({
+    type: 'Restaurant',
+    args: {
+      id: t.arg.id({ required: true }),
+      name: t.arg.string(),
+      email: t.arg.string(),
+      password: t.arg.string(),
+    },
+    resolve: async (query, _root, args, _ctx, _info) => {
+      const { id, name, email, password } = args;
+
+      const restaurant = await db.restaurant.findUnique({
+        ...query,
+        where: { id: id.toString() },
+      });
+
+      if (!restaurant) {
+        throw new Error('Restaurant does not exist');
+      }
+
+      return db.restaurant.update({
+        ...query,
+        where: { id: id.toString() },
+        data: {
+          name: name ?? restaurant.name,
+          email: email ?? restaurant.email,
+          password: password ?? restaurant.password,
+        },
+      });
+    },
+  }),
 }));
