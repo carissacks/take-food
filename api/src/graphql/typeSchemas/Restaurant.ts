@@ -6,5 +6,6 @@ builder.prismaObject('Restaurant', {
     id: t.exposeID('id'),
     name: t.exposeString('name'),
     email: t.exposeString('email'),
+    favoredByCustomers: t.relation('favoredByCustomers'),
   }),
 });

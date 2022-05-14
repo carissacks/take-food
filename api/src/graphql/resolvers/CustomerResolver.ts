@@ -1,6 +1,10 @@
 import { builder } from '../../builder';
 import { db } from '../../db';
 
+const OperationType = builder.enumType('OperationType', {
+  values: ['ADD', 'DELETE'] as const,
+});
+
 builder.queryFields((t) => ({
   customer: t.prismaField({
     type: 'Customer',
@@ -60,6 +64,37 @@ builder.mutationFields((t) => ({
           password: password ?? customer.password,
         },
       });
+    },
+  }),
+  favoriteRestaurant: t.prismaField({
+    type: 'Customer',
+    args: {
+      operation: t.arg({ type: OperationType, required: true }),
+      customerId: t.arg.id({ required: true }),
+      restaurantId: t.arg.id({ required: true }),
+    },
+    resolve: async (query, _root, args, _ctx, _info) => {
+      const { operation, customerId, restaurantId } = args;
+
+      return operation === 'ADD'
+        ? db.customer.update({
+            ...query,
+            where: { id: customerId.toString() },
+            data: {
+              favoriteRestaurants: {
+                connect: { id: restaurantId.toString() },
+              },
+            },
+          })
+        : db.customer.update({
+            ...query,
+            where: { id: customerId.toString() },
+            data: {
+              favoriteRestaurants: {
+                disconnect: { id: restaurantId.toString() },
+              },
+            },
+          });
     },
   }),
 }));
