@@ -14,6 +14,7 @@ builder.prismaObject('Product', {
       resolve: (root) => root.type,
     }),
     price: t.exposeInt('price'),
-    restaurantId: t.exposeID('restaurantId'),
+    restaurant: t.relation('restaurant'),
+    orderHistory: t.relation('orderHistory'),
   }),
 });

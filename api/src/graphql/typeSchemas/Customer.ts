@@ -7,5 +7,6 @@ builder.prismaObject('Customer', {
     name: t.exposeString('name'),
     email: t.exposeString('email'),
     favoriteRestaurant: t.relation('favoriteRestaurants'),
+    orderHistory: t.relation('orderHistory'),
   }),
 });
