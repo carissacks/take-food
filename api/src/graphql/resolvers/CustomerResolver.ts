@@ -1,5 +1,8 @@
+import bcrypt from 'bcrypt';
+
 import { builder } from '../../builder';
 import { db } from '../../db';
+import { SALT_ROUNDS } from '../../general/constants';
 
 const OperationType = builder.enumType('OperationType', {
   values: ['ADD', 'DELETE'] as const,
@@ -33,7 +36,14 @@ builder.mutationFields((t) => ({
       password: t.arg.string({ required: true }),
     },
     resolve: async (query, _root, { name, email, password }, _ctx, _info) =>
-      db.customer.create({ ...query, data: { name, email, password } }),
+      db.customer.create({
+        ...query,
+        data: {
+          name,
+          email,
+          password: await bcrypt.hash(password, SALT_ROUNDS),
+        },
+      }),
   }),
   updateCustomer: t.prismaField({
     type: 'Customer',
@@ -61,7 +71,9 @@ builder.mutationFields((t) => ({
         data: {
           name: name ?? customer.name,
           email: email ?? customer.email,
-          password: password ?? customer.password,
+          password: password
+            ? await bcrypt.hash(password, SALT_ROUNDS)
+            : customer.password,
         },
       });
     },

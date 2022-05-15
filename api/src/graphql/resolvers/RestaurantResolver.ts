@@ -1,5 +1,8 @@
+import bcrypt from 'bcrypt';
+
 import { builder } from '../../builder';
 import { db } from '../../db';
+import { SALT_ROUNDS } from '../../general/constants';
 
 builder.queryFields((t) => ({
   restaurant: t.prismaField({
@@ -29,7 +32,14 @@ builder.mutationFields((t) => ({
       password: t.arg.string({ required: true }),
     },
     resolve: async (query, _root, { name, email, password }, _ctx, _info) =>
-      db.restaurant.create({ ...query, data: { name, email, password } }),
+      db.restaurant.create({
+        ...query,
+        data: {
+          name,
+          email,
+          password: await bcrypt.hash(password, SALT_ROUNDS),
+        },
+      }),
   }),
   updateRestaurant: t.prismaField({
     type: 'Restaurant',
@@ -57,7 +67,9 @@ builder.mutationFields((t) => ({
         data: {
           name: name ?? restaurant.name,
           email: email ?? restaurant.email,
-          password: password ?? restaurant.password,
+          password: password
+            ? await bcrypt.hash(password, SALT_ROUNDS)
+            : restaurant.password,
         },
       });
     },
