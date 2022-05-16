@@ -4,7 +4,21 @@ import type PrismaTypes from '@pothos/plugin-prisma/generated';
 
 import { db } from './db';
 
-export const builder = new SchemaBuilder<{ PrismaTypes: PrismaTypes }>({
+type Context = {
+  accountId: string;
+};
+
+type Objects = {
+  Auth: {
+    token: string;
+  };
+};
+
+export const builder = new SchemaBuilder<{
+  Context: Context;
+  Objects: Objects;
+  PrismaTypes: PrismaTypes;
+}>({
   plugins: [PrismaPlugin],
   prisma: {
     client: db,
