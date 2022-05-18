@@ -700,6 +700,11 @@
   resolved "https://registry.yarnpkg.com/@pothos/core/-/core-3.10.1.tgz#aa398699dd11fddd14214643cde1c70db0db8ac9"
   integrity sha512-uQaMKhY9mngy12/zFBQFpr1Bex1S5ZJhvBcvrhsiYxly2i2OgXnsvk9rKjB/3EzP+sidJsKfifB9NEbevdRFzQ==
 
+"@pothos/plugin-errors@^3.4.1":
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/@pothos/plugin-errors/-/plugin-errors-3.4.1.tgz#c8a1bfd3fd329acfa05ac19d60bc447f4447a89d"
+  integrity sha512-8hDoy0oUC5FVrW+7F7n2q0O+vTwdab8ux96yTWJtsUOWS6/vJ6IO8gUpGpdZROfZeynTGNVhztSg444zwa6b0Q==
+
 "@pothos/plugin-prisma@^3.6.1":
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/@pothos/plugin-prisma/-/plugin-prisma-3.6.1.tgz#a6c4be85e1f9d14cb3a639aeb7629a887f45acba"

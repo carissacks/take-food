@@ -9,3 +9,5 @@ import './resolvers/CustomerResolver';
 import './resolvers/RestaurantResolver';
 import './resolvers/ProductResolver';
 import './resolvers/OrderHistoryResolver';
+
+import './errorTypes';

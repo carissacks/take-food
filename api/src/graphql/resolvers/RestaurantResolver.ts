@@ -3,18 +3,29 @@ import bcrypt from 'bcrypt';
 import { builder } from '../../builder';
 import { db } from '../../db';
 import { SALT_ROUNDS } from '../../general/constants';
+import { DataNotFoundError } from '../errorTypes';
 
 builder.queryFields((t) => ({
   restaurant: t.prismaField({
     type: 'Restaurant',
-    nullable: true,
-    args: { id: t.arg.id({ required: true }) },
-    resolve: async (query, _root, args, _ctx, _info) =>
-      db.restaurant.findUnique({
+    errors: {
+      types: [DataNotFoundError],
+    },
+    args: {
+      id: t.arg.id({ required: true }),
+    },
+    resolve: async (query, _root, { id }, _ctx, _info) => {
+      const restaurant = await db.restaurant.findUnique({
         ...query,
-        rejectOnNotFound: true,
-        where: { id: args.id.toString() },
-      }),
+        where: { id: id.toString() },
+      });
+
+      if (!restaurant) {
+        throw new DataNotFoundError('Restaurant', id.toString());
+      }
+
+      return restaurant;
+    },
   }),
   restaurants: t.prismaField({
     type: ['Restaurant'],
@@ -43,6 +54,9 @@ builder.mutationFields((t) => ({
   }),
   updateRestaurant: t.prismaField({
     type: 'Restaurant',
+    errors: {
+      types: [DataNotFoundError],
+    },
     args: {
       id: t.arg.id({ required: true }),
       name: t.arg.string(),
@@ -58,7 +72,7 @@ builder.mutationFields((t) => ({
       });
 
       if (!restaurant) {
-        throw new Error('Restaurant does not exist');
+        throw new DataNotFoundError('Restaurant', id.toString());
       }
 
       return db.restaurant.update({

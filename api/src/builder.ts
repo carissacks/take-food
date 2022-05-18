@@ -1,4 +1,5 @@
 import SchemaBuilder from '@pothos/core';
+import ErrorsPlugin from '@pothos/plugin-errors';
 import PrismaPlugin from '@pothos/plugin-prisma';
 import type PrismaTypes from '@pothos/plugin-prisma/generated';
 
@@ -19,7 +20,10 @@ export const builder = new SchemaBuilder<{
   Objects: Objects;
   PrismaTypes: PrismaTypes;
 }>({
-  plugins: [PrismaPlugin],
+  plugins: [ErrorsPlugin, PrismaPlugin],
+  errorOptions: {
+    defaultTypes: [Error],
+  },
   prisma: {
     client: db,
   },

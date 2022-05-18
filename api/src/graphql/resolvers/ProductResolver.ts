@@ -1,35 +1,51 @@
 import { builder } from '../../builder';
 import { db } from '../../db';
+import { DataNotFoundError } from '../errorTypes';
 import { ProductType } from '../typeSchemas/Product';
 
 builder.queryFields((t) => ({
   product: t.prismaField({
     type: 'Product',
-    nullable: true,
-    args: { id: t.arg.id({ required: true }) },
-    resolve: async (query, _root, args, _ctx, _info) =>
-      db.product.findUnique({
+    errors: {
+      types: [DataNotFoundError],
+    },
+    args: {
+      id: t.arg.id({ required: true }),
+    },
+    resolve: async (query, _root, { id }, _ctx, _info) => {
+      const product = await db.product.findUnique({
         ...query,
-        rejectOnNotFound: true,
-        where: { id: args.id.toString() },
-      }),
+        where: { id: id.toString() },
+      });
+
+      if (!product) {
+        throw new DataNotFoundError('Product', id.toString());
+      }
+
+      return product;
+    },
   }),
   products: t.prismaField({
     type: ['Product'],
-    args: { restaurantId: t.arg.id({ required: true }) },
-    resolve: async (query, _root, args, _ctx, _info) => {
+    errors: {
+      types: [DataNotFoundError],
+    },
+    args: {
+      restaurantId: t.arg.id({ required: true }),
+    },
+    resolve: async (query, _root, { restaurantId }, _ctx, _info) => {
       const restaurant = await db.restaurant.findUnique({
         ...query,
-        where: { id: args.restaurantId.toString() },
+        where: { id: restaurantId.toString() },
       });
 
       if (!restaurant) {
-        throw new Error('Restaurant does not exist');
+        throw new DataNotFoundError('Restaurant', restaurantId.toString());
       }
 
       return db.product.findMany({
         ...query,
-        where: { restaurantId: args.restaurantId.toString() },
+        where: { restaurantId: restaurantId.toString() },
       });
     },
   }),
@@ -38,6 +54,9 @@ builder.queryFields((t) => ({
 builder.mutationFields((t) => ({
   createProduct: t.prismaField({
     type: 'Product',
+    errors: {
+      types: [DataNotFoundError],
+    },
     args: {
       name: t.arg.string({ required: true }),
       type: t.arg({ type: ProductType }),
@@ -53,7 +72,7 @@ builder.mutationFields((t) => ({
       });
 
       if (!restaurant) {
-        throw new Error('Restaurant does not exist');
+        throw new DataNotFoundError('Restaurant', restaurantId.toString());
       }
 
       return db.product.create({
@@ -69,6 +88,9 @@ builder.mutationFields((t) => ({
   }),
   updateProduct: t.prismaField({
     type: 'Product',
+    errors: {
+      types: [DataNotFoundError],
+    },
     args: {
       id: t.arg.id({ required: true }),
       name: t.arg.string(),
@@ -84,7 +106,7 @@ builder.mutationFields((t) => ({
       });
 
       if (!product) {
-        throw new Error('Product does not exist');
+        throw new DataNotFoundError('Product', id.toString());
       }
 
       return db.product.update({

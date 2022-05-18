@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { builder } from '../../builder';
 import { db } from '../../db';
 import { SALT_ROUNDS } from '../../general/constants';
+import { DataNotFoundError } from '../errorTypes';
 
 const OperationType = builder.enumType('OperationType', {
   values: ['ADD', 'DELETE'] as const,
@@ -11,14 +12,24 @@ const OperationType = builder.enumType('OperationType', {
 builder.queryFields((t) => ({
   customer: t.prismaField({
     type: 'Customer',
-    nullable: true,
-    args: { id: t.arg.id({ required: true }) },
-    resolve: async (query, _root, args, _ctx, _info) =>
-      db.customer.findUnique({
+    errors: {
+      types: [DataNotFoundError],
+    },
+    args: {
+      id: t.arg.id({ required: true }),
+    },
+    resolve: async (query, _root, { id }, _ctx, _info) => {
+      const customer = await db.customer.findUnique({
         ...query,
-        rejectOnNotFound: true,
-        where: { id: args.id.toString() },
-      }),
+        where: { id: id.toString() },
+      });
+
+      if (!customer) {
+        throw new DataNotFoundError('Customer', id.toString());
+      }
+
+      return customer;
+    },
   }),
   customers: t.prismaField({
     type: ['Customer'],
@@ -47,6 +58,9 @@ builder.mutationFields((t) => ({
   }),
   updateCustomer: t.prismaField({
     type: 'Customer',
+    errors: {
+      types: [DataNotFoundError],
+    },
     args: {
       id: t.arg.id({ required: true }),
       name: t.arg.string(),
@@ -62,7 +76,7 @@ builder.mutationFields((t) => ({
       });
 
       if (!customer) {
-        throw new Error('Customer does not exist');
+        throw new DataNotFoundError('Customer', id.toString());
       }
 
       return db.customer.update({

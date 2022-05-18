@@ -41,6 +41,9 @@ builder.mutationFields((t) => ({
   }),
   login: t.field({
     type: 'Auth',
+    errors: {
+      types: [Error],
+    },
     args: {
       email: t.arg.string({ required: true }),
       password: t.arg.string({ required: true }),
@@ -58,7 +61,7 @@ builder.mutationFields((t) => ({
       } else {
         const restaurant = await db.restaurant.findUnique({ where: { email } });
         if (!restaurant) {
-          throw new Error('Account not found');
+          throw new Error('Incorrect email or password');
         }
         accountId = restaurant.id;
         accountPassword = restaurant.password;
@@ -67,7 +70,7 @@ builder.mutationFields((t) => ({
       const isPasswordValid = await bcrypt.compare(password, accountPassword);
 
       if (!isPasswordValid) {
-        throw new Error('Wrong password');
+        throw new Error('Incorrect email or password');
       }
 
       return { token: generateJWT(accountId) };
