@@ -4,9 +4,10 @@ import { builder } from '../../builder';
 import { db } from '../../db';
 import { SALT_ROUNDS } from '../../general/constants';
 import { generateJWT } from '../../helpers/jwt';
+import { AccountType } from '../../types/types';
 
 const AccountType = builder.enumType('AccountType', {
-  values: ['CUSTOMER', 'RESTAURANT'] as const,
+  values: ['Customer', 'Restaurant'] as const,
 });
 
 builder.mutationFields((t) => ({
@@ -24,7 +25,7 @@ builder.mutationFields((t) => ({
       const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
       let accountId;
-      if (accountType === 'CUSTOMER') {
+      if (accountType === 'Customer') {
         const customer = await db.customer.create({
           data: { name, email, password: hashedPassword },
         });
@@ -36,7 +37,7 @@ builder.mutationFields((t) => ({
         accountId = restaurant.id;
       }
 
-      return { token: generateJWT(accountId) };
+      return { token: generateJWT({ accountId, accountType }) };
     },
   }),
   login: t.field({
@@ -53,11 +54,13 @@ builder.mutationFields((t) => ({
 
       let accountId;
       let accountPassword;
+      let accountType: AccountType;
 
       const customer = await db.customer.findUnique({ where: { email } });
       if (customer) {
         accountId = customer.id;
         accountPassword = customer.password;
+        accountType = 'Customer';
       } else {
         const restaurant = await db.restaurant.findUnique({ where: { email } });
         if (!restaurant) {
@@ -65,6 +68,7 @@ builder.mutationFields((t) => ({
         }
         accountId = restaurant.id;
         accountPassword = restaurant.password;
+        accountType = 'Restaurant';
       }
 
       const isPasswordValid = await bcrypt.compare(password, accountPassword);
@@ -73,7 +77,7 @@ builder.mutationFields((t) => ({
         throw new Error('Incorrect email or password');
       }
 
-      return { token: generateJWT(accountId) };
+      return { token: generateJWT({ accountId, accountType }) };
     },
   }),
 }));

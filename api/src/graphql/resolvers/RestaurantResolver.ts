@@ -8,6 +8,9 @@ import { DataNotFoundError } from '../errorTypes';
 builder.queryFields((t) => ({
   restaurant: t.prismaField({
     type: 'Restaurant',
+    authScopes: {
+      isAuthenticated: true,
+    },
     errors: {
       types: [DataNotFoundError],
     },
@@ -29,6 +32,9 @@ builder.queryFields((t) => ({
   }),
   restaurants: t.prismaField({
     type: ['Restaurant'],
+    authScopes: {
+      isAuthenticated: true,
+    },
     resolve: async (query, _root, _args, _ctx, _info) =>
       db.restaurant.findMany({ ...query }),
   }),
@@ -54,6 +60,8 @@ builder.mutationFields((t) => ({
   }),
   updateRestaurant: t.prismaField({
     type: 'Restaurant',
+    authScopes: (_root, args, ctx, _info) =>
+      args.id === ctx.accountId ? { accountType: 'Restaurant' } : false,
     errors: {
       types: [DataNotFoundError],
     },

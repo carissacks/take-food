@@ -12,6 +12,8 @@ const OperationType = builder.enumType('OperationType', {
 builder.queryFields((t) => ({
   customer: t.prismaField({
     type: 'Customer',
+    authScopes: (_root, args, ctx, _info) =>
+      args.id === ctx.accountId ? { accountType: 'Customer' } : false,
     errors: {
       types: [DataNotFoundError],
     },
@@ -58,6 +60,8 @@ builder.mutationFields((t) => ({
   }),
   updateCustomer: t.prismaField({
     type: 'Customer',
+    authScopes: (_root, args, ctx, _info) =>
+      args.id === ctx.accountId ? { accountType: 'Customer' } : false,
     errors: {
       types: [DataNotFoundError],
     },
@@ -94,6 +98,8 @@ builder.mutationFields((t) => ({
   }),
   favoriteRestaurant: t.prismaField({
     type: 'Customer',
+    authScopes: (_root, args, ctx, _info) =>
+      args.customerId === ctx.accountId ? { accountType: 'Customer' } : false,
     args: {
       operation: t.arg({ type: OperationType, required: true }),
       customerId: t.arg.id({ required: true }),

@@ -5,6 +5,7 @@ import { DataNotFoundError } from '../errorTypes';
 builder.queryFields((t) => ({
   orderHistory: t.prismaField({
     type: ['OrderHistory'],
+    authScopes: (_root, args, ctx, _info) => args.id === ctx.accountId,
     errors: {
       types: [DataNotFoundError],
     },
@@ -47,6 +48,8 @@ builder.queryFields((t) => ({
 builder.mutationFields((t) => ({
   createOrderHistory: t.prismaField({
     type: 'OrderHistory',
+    authScopes: (_root, args, ctx, _info) =>
+      args.customerId === ctx.accountId || args.restaurantId === ctx.accountId,
     args: {
       customerId: t.arg.id({ required: true }),
       restaurantId: t.arg.id({ required: true }),

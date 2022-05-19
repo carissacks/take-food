@@ -6,6 +6,9 @@ import { ProductType } from '../typeSchemas/Product';
 builder.queryFields((t) => ({
   product: t.prismaField({
     type: 'Product',
+    authScopes: {
+      isAuthenticated: true,
+    },
     errors: {
       types: [DataNotFoundError],
     },
@@ -27,6 +30,9 @@ builder.queryFields((t) => ({
   }),
   products: t.prismaField({
     type: ['Product'],
+    authScopes: {
+      isAuthenticated: true,
+    },
     errors: {
       types: [DataNotFoundError],
     },
@@ -54,6 +60,10 @@ builder.queryFields((t) => ({
 builder.mutationFields((t) => ({
   createProduct: t.prismaField({
     type: 'Product',
+    authScopes: (_root, args, ctx, _info) =>
+      args.restaurantId === ctx.accountId
+        ? { accountType: 'Restaurant' }
+        : false,
     errors: {
       types: [DataNotFoundError],
     },
@@ -88,6 +98,10 @@ builder.mutationFields((t) => ({
   }),
   updateProduct: t.prismaField({
     type: 'Product',
+    authScopes: (_root, args, ctx, _info) =>
+      args.restaurantId === ctx.accountId
+        ? { accountType: 'Restaurant' }
+        : false,
     errors: {
       types: [DataNotFoundError],
     },
@@ -96,6 +110,7 @@ builder.mutationFields((t) => ({
       name: t.arg.string(),
       type: t.arg({ type: ProductType }),
       price: t.arg.int(),
+      restaurantId: t.arg.id({ required: true }),
     },
     resolve: async (query, _root, args, _ctx, _info) => {
       const { id, name, type, price } = args;
@@ -122,7 +137,14 @@ builder.mutationFields((t) => ({
   }),
   deleteProduct: t.prismaField({
     type: 'Product',
-    args: { id: t.arg.id({ required: true }) },
+    authScopes: (_root, args, ctx, _info) =>
+      args.restaurantId === ctx.accountId
+        ? { accountType: 'Restaurant' }
+        : false,
+    args: {
+      id: t.arg.id({ required: true }),
+      restaurantId: t.arg.id({ required: true }),
+    },
     resolve: async (query, _root, { id }, _ctx, _info) =>
       db.product.delete({ ...query, where: { id: id.toString() } }),
   }),

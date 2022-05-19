@@ -8,9 +8,9 @@ const server = createServer({
   schema,
   context: ({ req }) => {
     const token = req.headers.authorization ?? '';
-    const accountId = decodeJWT(token);
+    const { accountId, accountType } = decodeJWT(token);
 
-    return { ...initContextCache(), accountId };
+    return { ...initContextCache(), accountId, accountType };
   },
 });
 

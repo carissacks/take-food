@@ -19,6 +19,7 @@
     "@pothos/core": "^3.10.1",
     "@pothos/plugin-errors": "^3.4.1",
     "@pothos/plugin-prisma": "^3.6.1",
+    "@pothos/plugin-scope-auth": "^3.9.0",
     "@prisma/client": "^3.14.0",
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.1",
