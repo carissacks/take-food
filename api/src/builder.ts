@@ -29,16 +29,16 @@ export const builder = new SchemaBuilder<{
   AuthScopes: AuthScopes;
   PrismaTypes: PrismaTypes;
 }>({
-  plugins: [ScopeAuthPlugin, ErrorsPlugin, PrismaPlugin],
+  plugins: [ErrorsPlugin, ScopeAuthPlugin, PrismaPlugin],
+  errorOptions: {
+    defaultTypes: [Error],
+  },
   authScopes: async (context) => ({
     isAuthenticated: context.accountId !== '',
     accountType: (type) => context.accountType === type,
   }),
   scopeAuthOptions: {
     unauthorizedError: () => new Error('Not authorized'),
-  },
-  errorOptions: {
-    defaultTypes: [Error],
   },
   prisma: {
     client: db,

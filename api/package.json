@@ -2,8 +2,8 @@
   "name": "takefood-api",
   "version": "1.0.0",
   "scripts": {
-    "start": "nodemon -r @swc-node/register src/index.ts",
-    "dev": "ts-node-dev --no-notify --respawn --transpile-only src/index.ts",
+    "start": "node -r @swc-node/register src/index.ts",
+    "dev": "nodemon -r @swc-node/register src/index.ts",
     "build": "tsc --outDir lib/",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
